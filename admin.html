@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin</title>
+<link rel="icon" href="lg.jpg">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<div class="container">
+<div class="card">
+
+<h2>Área Administrativa</h2>
+
+<input id="tel" placeholder="Telefone">
+<input id="senha" type="password" placeholder="Senha">
+<button id="acessar">Acessar</button>
+
+<div id="painel" style="display:none">
+<input id="titulo" placeholder="Título">
+<textarea id="texto" placeholder="Texto"></textarea>
+<input id="media" placeholder="URL imagem ou vídeo">
+<button id="pub">Publicar</button>
+<div id="lista"></div>
+</div>
+
+</div>
+</div>
+
+<script type="module">
+import "./supabase.js";
+
+acessar.onclick = async ()=>{
+const {data}=await supabase.from("admin_access")
+.select("*").eq("telefone",tel.value).eq("senha",senha.value);
+if(data.length){painel.style.display="block";load();}
+else alert("Negado");
+}
+
+async function load(){
+const {data}=await supabase.from("posts").select("*");
+lista.innerHTML="";
+data.forEach(p=>{
+lista.innerHTML+=`
+<div class="card">
+<h4>${p.titulo}</h4>
+<button onclick="del('${p.id}')">Excluir</button>
+</div>`;
+});
+}
+
+window.del=async id=>{
+await supabase.from("posts").delete().eq("id",id);
+load();
+}
+
+pub.onclick=async()=>{
+await supabase.from("posts").insert([{titulo:titulo.value,texto:texto.value,media:media.value}]);
+load();
+}
+</script>
+</body>
+</html>

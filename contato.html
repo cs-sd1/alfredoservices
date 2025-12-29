@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contato | Alfredo Services</title>
+
+<meta name="description" content="Entre em contacto com a Alfredo Services para serviços profissionais e formação.">
+<meta property="og:image" content="lg.jpg">
+
+<link rel="icon" href="lg.jpg">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+  <img src="lg.jpg" class="logo" alt="Alfredo Services">
+  <nav>
+    <a href="index.html">Início</a>
+    <a href="contato.html">Contato</a>
+    <a href="admin.html">⚙</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="card">
+    <h2>Entre em Contato</h2>
+    <form id="whatsappForm">
+      <label>📞 Número (obrigatório)</label>
+      <input type="text" id="numero" placeholder="+244 9XX XXX XXX" required>
+
+      <label>✉ Email (opcional)</label>
+      <input type="email" id="email" placeholder="seuemail@exemplo.com">
+
+      <label>📝 Assunto (obrigatório)</label>
+      <input type="text" id="assunto" placeholder="Assunto" required>
+
+      <label>💬 Descrição (obrigatório)</label>
+      <textarea id="descricao" placeholder="Detalhes da sua mensagem" required></textarea>
+
+      <button type="submit">Enviar via WhatsApp</button>
+    </form>
+  </div>
+</div>
+
+<footer>
+© Alfredo Services
+</footer>
+
+<script>
+document.getElementById("whatsappForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const numero = document.getElementById("numero").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const assunto = document.getElementById("assunto").value.trim();
+  const descricao = document.getElementById("descricao").value.trim();
+
+  if (!numero || !assunto || !descricao) {
+    alert("Por favor, preencha os campos obrigatórios!");
+    return;
+  }
+
+  // Formata a mensagem para WhatsApp
+  const hoje = new Date();
+  const data = hoje.toLocaleDateString() + " " + hoje.toLocaleTimeString();
+
+  let mensagem = `👤 *Novo contato*\n\n`;
+  mensagem += `📞 Número: ${numero}\n`;
+  if(email) mensagem += `✉ Email: ${email}\n`;
+  mensagem += `📝 Assunto: ${assunto}\n`;
+  mensagem += `💬 Descrição:\n${descricao}\n\n`;
+  mensagem += `📅 Data: ${data}`;
+
+  const url = `https://wa.me/244930349132?text=${encodeURIComponent(mensagem)}`;
+  window.open(url, "_blank");
+});
+</script>
+
+</body>
+</html>

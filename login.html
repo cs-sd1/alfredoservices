@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Admin</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <label>Telefone</label><input type="text" id="telefone">
+      <label>Senha</label><input type="password" id="senha">
+      <button type="submit">Entrar</button>
+    </form>
+    <div id="status"></div>
+  </div>
+
+  <script type="module">
+    import { supabase } from "./supabase.js";
+
+    const form = document.getElementById("loginForm");
+    const status = document.getElementById("status");
+
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      const telefone = document.getElementById("telefone").value;
+      const senha = document.getElementById("senha").value;
+
+      const { data } = await supabase
+        .from("allowed_users")
+        .select("*")
+        .eq("telefone", telefone)
+        .eq("senha", senha);
+
+      if (data.length) {
+        localStorage.setItem("adminTel", telefone);
+        window.location = "admin.html";
+      } else {
+        status.innerText = "Credenciais inválidas.";
+      }
+    });
+  </script>
+</body>
+</html>
