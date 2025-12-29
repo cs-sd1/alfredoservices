@@ -32,11 +32,124 @@
   <p>Excelência em serviços profissionais, formação e soluções digitais</p>
 </section>
 
-
 <section class="container">
   <h2>Atualizações recentes</h2>
   <div id="posts"></div>
 </section>
+
+<style>
+  .post-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    padding: 15px;
+    margin-bottom: 20px;
+    word-wrap: break-word;
+  }
+
+  .post-card img,
+  .post-card video {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    display: block;
+    margin-top: 10px;
+  }
+
+  .post-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 10px 0 5px 0;
+  }
+
+  .post-text {
+    margin-bottom: 10px;
+  }
+
+  .post-date {
+    font-size: 0.85em;
+    color: #777;
+    margin-top: 5px;
+  }
+
+  .whatsapp-button {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background-color: #25D366;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .whatsapp-button:hover {
+    background-color: #1ebe57;
+  }
+</style>
+
+<script type="module">
+import { supabase } from "./supabase.js";
+
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2,"0");
+  const month = String(date.getMonth()+1).padStart(2,"0");
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2,"0");
+  const minutes = String(date.getMinutes()).padStart(2,"0");
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
+}
+
+async function loadMainPosts() {
+  const postsContainer = document.getElementById("posts");
+  postsContainer.innerHTML = "Carregando atualizações...";
+
+  const { data, error } = await supabase
+    .from("posts")
+    .select("*")
+    .order("id", { ascending: false });
+
+  if (error) {
+    postsContainer.innerHTML = "Erro ao carregar posts: " + error.message;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    postsContainer.innerHTML = "<p>Nenhuma atualização recente.</p>";
+    return;
+  }
+
+  postsContainer.innerHTML = "";
+  data.forEach(p => {
+    let mediaHTML = "";
+    let whatsappButton = "";
+
+    if (p.media) {
+      if (p.media.match(/\.(mp4|webm|ogg)$/i)) {
+        mediaHTML = `<video src="${p.media}" controls style="width:100%;"></video>`;
+        whatsappButton = `<a class="whatsapp-button" href="https://wa.me/244930349132?text=${encodeURIComponent('Olá! Quero saber mais sobre ' + p.titulo)}" target="_blank">Saber mais sobre isso</a>`;
+      } else {
+        mediaHTML = `<img src="${p.media}">`;
+      }
+    }
+
+    postsContainer.innerHTML += `
+      <div class="post-card">
+        ${mediaHTML}
+        <div class="post-title">${p.titulo}</div>
+        <div class="post-text">${p.texto}</div>
+        ${whatsappButton}
+        <div class="post-date">Publicado em ${formatDate(p.created_at)}</div>
+      </div>
+    `;
+  });
+}
+
+// Carregar posts ao abrir a página
+loadMainPosts();
+</script>
 
 <section class="container">
   <h2>Nossos Serviços</h2>
@@ -101,8 +214,9 @@ btnPatrocinar.addEventListener("click", () => {
 </script>
     </div>
 
-    <div class="card">
-      <img src="https://images.pexels.com/photos/4620769/pexels-photo-4620769.jpeg">
+<div class="card">
+  <img src="imagem.jpeg" alt="Imagem de corte e costura">
+</div>
       <h3>Corte e Costura</h3>
       <p>Confecção, ajustes e formação profissional em corte e costura com qualidade e precisão.</p>
       <!-- Botão Solicitar Costura -->
@@ -162,7 +276,7 @@ btnDecoracao.addEventListener("click", () => {
     <div class="card">
       <img src="https://images.pexels.com/photos/4109997/pexels-photo-4109997.jpeg">
       <h3>Pastelaria</h3>
-      <p>Produção de bolos, doces e serviços de pastelaria para eventos e encomendas especiais.</p>
+      <p>Produção de bolos, doces, salgados e serviços de pastelaria para eventos e encomendas especiais.</p>
       <!-- Botão Solicitar Pastelaria -->
 <button id="solicitarPastelariaBtn">🍰 Solicitar serviços de Pastelaria</button>
 

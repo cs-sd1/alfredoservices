@@ -3,63 +3,305 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin</title>
+<title>Admin | Alfredo Services</title>
 <link rel="icon" href="lg.jpg">
-<link rel="stylesheet" href="style.css">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 10px;
+  }
+
+  .card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    word-wrap: break-word;
+  }
+
+  h2, h3 {
+    margin-top: 0;
+    color: #333;
+  }
+
+  input, textarea, button {
+    width: 100%;
+    padding: 10px;
+    margin: 6px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #45a049;
+  }
+
+  .post-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 10px 0 5px 0;
+  }
+
+  .post-text {
+    margin-bottom: 10px;
+  }
+
+  .post-date {
+    font-size: 0.85em;
+    color: #777;
+    margin-top: 5px;
+  }
+
+  .post-container {
+    margin-bottom: 25px;
+  }
+
+  img, video {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    display: block;
+    margin-top: 10px;
+  }
+
+  .whatsapp-button {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background-color: #25D366;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .whatsapp-button:hover {
+    background-color: #1ebe57;
+  }
+
+  #postStatus {
+    margin-top: 10px;
+    font-weight: bold;
+  }
+</style>
 </head>
-
 <body>
+
 <div class="container">
-<div class="card">
+  <div class="card">
+    <h2>Área Administrativa</h2>
 
-<h2>Área Administrativa</h2>
+    <!-- LOGIN -->
+    <input id="tel" placeholder="Telefone">
+    <input id="senha" type="password" placeholder="Senha">
+    <button id="acessar">Acessar</button>
+    <p id="status" style="color:red;margin-top:10px;"></p>
 
-<input id="tel" placeholder="Telefone">
-<input id="senha" type="password" placeholder="Senha">
-<button id="acessar">Acessar</button>
+    <!-- PAINEL -->
+    <div id="painel" style="display:none;margin-top:20px;">
+      <input id="titulo" placeholder="Título">
+      <textarea id="texto" placeholder="Texto"></textarea>
+      <input type="file" id="mediaFile" accept="image/*,video/*">
+      <button id="pub">Publicar</button>
 
-<div id="painel" style="display:none">
-<input id="titulo" placeholder="Título">
-<textarea id="texto" placeholder="Texto"></textarea>
-<input id="media" placeholder="URL imagem ou vídeo">
-<button id="pub">Publicar</button>
-<div id="lista"></div>
-</div>
-
-</div>
+      <h3>Posts</h3>
+      <div id="lista"></div>
+      <p id="postStatus"></p>
+    </div>
+  </div>
 </div>
 
 <script type="module">
-import "./supabase.js";
+import { supabase } from "./supabase.js";
 
-acessar.onclick = async ()=>{
-const {data}=await supabase.from("admin_access")
-.select("*").eq("telefone",tel.value).eq("senha",senha.value);
-if(data.length){painel.style.display="block";load();}
-else alert("Negado");
+// ELEMENTOS
+const tel = document.getElementById("tel");
+const senha = document.getElementById("senha");
+const acessar = document.getElementById("acessar");
+const painel = document.getElementById("painel");
+const titulo = document.getElementById("titulo");
+const texto = document.getElementById("texto");
+const mediaFile = document.getElementById("mediaFile");
+const pub = document.getElementById("pub");
+const lista = document.getElementById("lista");
+const status = document.getElementById("status");
+const postStatus = document.getElementById("postStatus");
+
+// LOGIN
+acessar.onclick = async () => {
+  status.textContent = "Verificando...";
+  try {
+    const { data, error } = await supabase
+      .from("login")
+      .select("id")
+      .eq("telefone", tel.value.trim())
+      .eq("senha", senha.value.trim());
+
+    if (error) throw error;
+
+    if (data.length > 0) {
+      status.textContent = "Acesso permitido";
+      painel.style.display = "block";
+      loadPosts();
+    } else {
+      status.textContent = "Acesso negado";
+    }
+  } catch (err) {
+    status.textContent = err.message;
+  }
+};
+
+// FORMATAR DATA
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2,"0");
+  const month = String(date.getMonth()+1).padStart(2,"0");
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2,"0");
+  const minutes = String(date.getMinutes()).padStart(2,"0");
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
 }
 
-async function load(){
-const {data}=await supabase.from("posts").select("*");
-lista.innerHTML="";
-data.forEach(p=>{
-lista.innerHTML+=`
-<div class="card">
-<h4>${p.titulo}</h4>
-<button onclick="del('${p.id}')">Excluir</button>
-</div>`;
-});
+// CARREGAR POSTS
+async function loadPosts() {
+  postStatus.style.color = "black";
+  postStatus.textContent = "Carregando...";
+  lista.innerHTML = "";
+
+  const { data, error } = await supabase
+    .from("posts")
+    .select("*")
+    .order("id", { ascending: false }); // mais recentes no topo
+
+  if (error) {
+    postStatus.style.color = "red";
+    postStatus.textContent = error.message;
+    return;
+  }
+
+  if (data.length === 0) {
+    lista.innerHTML = "<p>Nenhum post ainda.</p>";
+    postStatus.textContent = "";
+    return;
+  }
+
+  data.forEach(p => {
+    let mediaHTML = "";
+    let whatsappButton = "";
+
+    if (p.media) {
+      if (p.media.match(/\.(mp4|webm|ogg)$/i)) {
+        mediaHTML = `<video id="video-${p.id}" src="${p.media}" style="width:100%;" controls></video>`;
+        whatsappButton = `<a class="whatsapp-button" href="https://wa.me/244930349132?text=${encodeURIComponent('Olá! Quero saber mais sobre ' + p.titulo)}" target="_blank">Saber mais sobre isso</a>`;
+      } else {
+        mediaHTML = `<img src="${p.media}">`;
+      }
+    }
+
+    lista.innerHTML += `
+      <div class="card post-container">
+        ${mediaHTML}
+        <div class="post-title">${p.titulo}</div>
+        <div class="post-text">${p.texto}</div>
+        ${whatsappButton}
+        <div class="post-date">Publicado em ${formatDate(p.created_at)}</div>
+        <button onclick="deletePost('${p.id}')">Excluir</button>
+      </div>
+    `;
+  });
+
+  postStatus.style.color = "green";
+  postStatus.textContent = "Posts carregados!";
 }
 
-window.del=async id=>{
-await supabase.from("posts").delete().eq("id",id);
-load();
-}
+// EXCLUIR
+window.deletePost = async (id) => {
+  postStatus.style.color = "black";
+  postStatus.textContent = "Excluindo...";
+  const { error } = await supabase.from("posts").delete().eq("id", id);
+  if (error) {
+    postStatus.style.color = "red";
+    postStatus.textContent = error.message;
+    return;
+  }
+  loadPosts();
+};
 
-pub.onclick=async()=>{
-await supabase.from("posts").insert([{titulo:titulo.value,texto:texto.value,media:media.value}]);
-load();
-}
+// PUBLICAR
+pub.onclick = async () => {
+  if (!titulo.value.trim() || !texto.value.trim()) {
+    postStatus.style.color = "red";
+    postStatus.textContent = "Preencha título e texto";
+    return;
+  }
+
+  postStatus.style.color = "black";
+  postStatus.textContent = "Publicando...";
+
+  let mediaURL = null;
+
+  if (mediaFile.files.length > 0) {
+    const file = mediaFile.files[0];
+    const path = `${Date.now()}_${file.name}`;
+
+    const { data, error } = await supabase.storage.from("media").upload(path, file);
+    if (error) {
+      postStatus.style.color = "red";
+      postStatus.textContent = error.message;
+      return;
+    }
+
+    const { data: publicData, error: urlError } = supabase.storage.from("media").getPublicUrl(data.path);
+    if (urlError) {
+      postStatus.style.color = "red";
+      postStatus.textContent = urlError.message;
+      return;
+    }
+
+    mediaURL = publicData.publicUrl;
+  }
+
+  const { error } = await supabase.from("posts").insert([{
+    titulo: titulo.value.trim(),
+    texto: texto.value.trim(),
+    media: mediaURL
+  }]);
+
+  if (error) {
+    postStatus.style.color = "red";
+    postStatus.textContent = error.message;
+    return;
+  }
+
+  titulo.value = "";
+  texto.value = "";
+  mediaFile.value = "";
+  postStatus.style.color = "green";
+  postStatus.textContent = "Publicado com sucesso!";
+  loadPosts();
+};
 </script>
 </body>
 </html>
