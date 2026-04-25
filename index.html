@@ -1,33 +1,963 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title id="titulo">Site</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Central de Conteúdos — Albertina Silva AST</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8D5A3;
+    --gold-dark: #9A7A2E;
+    --cream: #FAF6EF;
+    --beige: #F0E8D8;
+    --brown-dark: #2C1A0E;
+    --brown-mid: #5C3D2E;
+    --brown-light: #A07850;
+    --white: #FFFFFF;
+    --shadow: rgba(44, 26, 14, 0.12);
+    --shadow-deep: rgba(44, 26, 14, 0.22);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Lato', sans-serif;
+    background: var(--cream);
+    color: var(--brown-dark);
+    min-height: 100vh;
+  }
+
+  /* ---- HEADER ---- */
+  header {
+    background: linear-gradient(135deg, var(--brown-dark) 0%, var(--brown-mid) 60%, #3D2010 100%);
+    padding: 32px 24px 28px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A84C' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 1;
+  }
+  .header-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 700px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .logo-wrap {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    border: 3px solid var(--gold);
+    box-shadow: 0 0 0 6px rgba(201,168,76,0.18), 0 8px 32px var(--shadow-deep);
+    overflow: hidden;
+    background: var(--beige);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-wrap img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .logo-placeholder {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: var(--gold);
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    color: var(--white);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+  }
+  header h1 span { color: var(--gold-light); }
+  header p.subtitle {
+    font-size: 0.88rem;
+    color: var(--gold-light);
+    font-weight: 300;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .gold-divider {
+    width: 60px; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 2px auto;
+  }
+
+  /* ---- SEARCH ---- */
+  .search-wrap {
+    background: var(--beige);
+    border-bottom: 1px solid var(--gold-light);
+    padding: 18px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px var(--shadow);
+  }
+  .search-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .search-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: var(--white);
+    border: 1.5px solid var(--gold-light);
+    border-radius: 40px;
+    padding: 10px 18px;
+    gap: 10px;
+    box-shadow: 0 2px 8px var(--shadow);
+    transition: border-color 0.2s;
+  }
+  .search-box:focus-within { border-color: var(--gold); }
+  .search-box svg { color: var(--gold); flex-shrink: 0; }
+  .search-box input {
+    border: none; outline: none;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.95rem;
+    color: var(--brown-dark);
+    width: 100%;
+    background: transparent;
+  }
+  .search-box input::placeholder { color: var(--brown-light); }
+  #clearSearch {
+    background: none; border: none; cursor: pointer;
+    color: var(--brown-light); font-size: 1.1rem; padding: 0 4px;
+    display: none;
+  }
+  #clearSearch.visible { display: block; }
+
+  /* ---- LAYOUT ---- */
+  .main-layout {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 0;
+    min-height: calc(100vh - 200px);
+  }
+
+  /* ---- SIDEBAR ---- */
+  .sidebar {
+    background: var(--white);
+    border-right: 1px solid var(--gold-light);
+    padding: 28px 0 40px;
+    position: sticky;
+    top: 69px;
+    height: calc(100vh - 69px);
+    overflow-y: auto;
+  }
+  .sidebar h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.78rem;
+    color: var(--gold-dark);
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    padding: 0 22px 14px;
+    border-bottom: 1px solid var(--beige);
+    margin-bottom: 8px;
+  }
+  .cat-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px 22px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.87rem;
+    color: var(--brown-mid);
+    transition: all 0.18s;
+    border-left: 3px solid transparent;
+    position: relative;
+  }
+  .cat-btn .cat-icon { font-size: 1.1rem; width: 22px; text-align: center; }
+  .cat-btn .cat-name { flex: 1; font-weight: 400; }
+  .cat-btn .cat-count {
+    background: var(--beige);
+    color: var(--brown-light);
+    font-size: 0.72rem;
+    font-weight: 700;
+    border-radius: 20px;
+    padding: 1px 7px;
+    min-width: 22px;
+    text-align: center;
+  }
+  .cat-btn:hover { background: var(--beige); color: var(--brown-dark); }
+  .cat-btn.active {
+    background: linear-gradient(90deg, rgba(201,168,76,0.12), transparent);
+    color: var(--brown-dark);
+    border-left-color: var(--gold);
+    font-weight: 700;
+  }
+  .cat-btn.active .cat-count { background: var(--gold-light); color: var(--gold-dark); }
+
+  /* ---- CONTENT ---- */
+  .content-area {
+    padding: 32px 28px 60px;
+    background: var(--cream);
+  }
+  .section-header {
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .section-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    color: var(--brown-dark);
+    font-weight: 700;
+  }
+  .section-header .section-icon { font-size: 1.6rem; }
+  .section-count {
+    font-size: 0.8rem;
+    color: var(--brown-light);
+    background: var(--beige);
+    border: 1px solid var(--gold-light);
+    border-radius: 20px;
+    padding: 3px 12px;
+    margin-bottom: 4px;
+    white-space: nowrap;
+  }
+  .section-desc {
+    font-size: 0.88rem;
+    color: var(--brown-light);
+    font-style: italic;
+    margin-bottom: 22px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--gold-light);
+  }
+
+  /* ---- CARDS ---- */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: var(--white);
+    border: 1px solid var(--gold-light);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 2px 10px var(--shadow);
+    transition: all 0.22s;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .card:hover {
+    box-shadow: 0 6px 24px var(--shadow-deep);
+    border-color: var(--gold);
+    transform: translateY(-2px);
+  }
+  .card-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--gold-dark);
+    background: var(--beige);
+    border-radius: 20px;
+    padding: 3px 10px;
+    align-self: flex-start;
+  }
+  .card-text {
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: var(--brown-dark);
+    flex: 1;
+    white-space: pre-wrap;
+  }
+  .card-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .platform-badges { display: flex; gap: 6px; }
+  .badge {
+    font-size: 0.68rem;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .badge.fb { background: #E8F0FE; color: #1A5FFF; }
+  .badge.wa { background: #E7F9F0; color: #128C3E; }
+  .copy-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.18s;
+    box-shadow: 0 2px 8px rgba(154,122,46,0.3);
+  }
+  .copy-btn:hover {
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    transform: scale(1.03);
+    box-shadow: 0 4px 14px rgba(154,122,46,0.4);
+  }
+  .copy-btn.copied {
+    background: linear-gradient(135deg, #2E7D32, #4CAF50);
+    box-shadow: 0 2px 8px rgba(46,125,50,0.3);
+  }
+
+  /* ---- SEARCH RESULTS ---- */
+  .search-results-header {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--brown-mid);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--gold-light);
+  }
+  .search-results-header span { color: var(--gold-dark); }
+  .no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--brown-light);
+  }
+  .no-results .no-icon { font-size: 3rem; margin-bottom: 12px; }
+  .no-results p { font-size: 0.95rem; }
+
+  /* ---- CATEGORY SECTION ---- */
+  .category-section { margin-bottom: 50px; }
+
+  /* ---- MOBILE ---- */
+  .mobile-cat-toggle {
+    display: none;
+    width: 100%;
+    padding: 12px 18px;
+    background: var(--white);
+    border: 1.5px solid var(--gold-light);
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.9rem;
+    color: var(--brown-dark);
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    font-weight: 700;
+  }
+  .mobile-sidebar {
+    display: none;
+    background: var(--white);
+    border: 1px solid var(--gold-light);
+    border-radius: 10px;
+    margin-bottom: 24px;
+    padding: 10px 0;
+    box-shadow: 0 4px 16px var(--shadow);
+  }
+  .mobile-sidebar.open { display: block; }
+
+  @media (max-width: 768px) {
+    .main-layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .mobile-cat-toggle { display: flex; }
+    .content-area { padding: 20px 16px 40px; }
+    .cards-grid { grid-template-columns: 1fr; }
+    .search-wrap { padding: 14px 16px; }
+    header { padding: 24px 16px 22px; }
+    .logo-wrap { width: 72px; height: 72px; }
+  }
+
+  /* ---- FOOTER ---- */
+  footer {
+    background: var(--brown-dark);
+    color: var(--gold-light);
+    text-align: center;
+    padding: 20px;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+  }
+  footer span { color: var(--gold); }
+
+  /* ---- SCROLLBAR ---- */
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--gold-light); border-radius: 10px; }
+
+  /* ---- TOAST ---- */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--brown-dark);
+    color: var(--gold-light);
+    border: 1px solid var(--gold);
+    padding: 12px 24px;
+    border-radius: 40px;
+    font-size: 0.88rem;
+    z-index: 9999;
+    transition: transform 0.3s ease;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
 </head>
 <body>
 
+<!-- HEADER -->
 <header>
-  <h1 id="nome">Nome do Negócio</h1>
-  <p id="slogan">Slogan aqui</p>
+  <div class="header-inner">
+    <div class="logo-wrap">
+      <img src="logoast.jpg" alt="Logo Albertina Silva AST" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="logo-placeholder" style="display:none;align-items:center;justify-content:center;width:100%;height:100%;flex-direction:column;">AST</div>
+    </div>
+    <div>
+      <h1>Central de Conteúdos<br><span>Albertina Silva AST</span></h1>
+      <div class="gold-divider"></div>
+      <p class="subtitle">Respostas prontas · Facebook &amp; WhatsApp · Moda Feminina</p>
+    </div>
+  </div>
 </header>
 
-<section>
-  <h2>Serviços</h2>
-  <ul id="servicos"></ul>
-</section>
+<!-- SEARCH -->
+<div class="search-wrap">
+  <div class="search-inner">
+    <div class="search-box">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="Pesquisar respostas... ex: entrega, tamanho, preço">
+      <button id="clearSearch" onclick="clearSearch()">✕</button>
+    </div>
+  </div>
+</div>
 
-<section>
-  <h2>Contacto</h2>
-  <p id="endereco"></p>
-  <a id="whatsapp" target="_blank">Falar no WhatsApp</a>
-</section>
+<!-- LAYOUT -->
+<div class="main-layout">
+  <!-- SIDEBAR (desktop) -->
+  <aside class="sidebar">
+    <h3>Categorias</h3>
+    <div id="sidebarCats"></div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content-area">
+    <!-- MOBILE CAT TOGGLE -->
+    <button class="mobile-cat-toggle" onclick="toggleMobileSidebar()">
+      <span>📂 Filtrar por categoria</span>
+      <span id="mobileArrow">▼</span>
+    </button>
+    <div class="mobile-sidebar" id="mobileSidebar"></div>
+
+    <div id="contentArea"></div>
+  </main>
+</div>
 
 <footer>
-  <p>© <span id="ano"></span> <span id="rodape"></span></p>
+  Criado com 💛 para <span>Albertina Silva AST</span> — Moda Feminina · Todos os direitos reservados
 </footer>
 
-<script src="script.js"></script>
+<div class="toast" id="toast">✓ Resposta copiada!</div>
+
+<script>
+const data = [
+  {
+    id: "boas-vindas",
+    icon: "👋",
+    name: "Primeira Mensagem Recebida",
+    desc: "Para quando alguém chega pela primeira vez no inbox — WhatsApp ou Facebook.",
+    platform: ["wa", "fb"],
+    responses: [
+      {
+        tag: "Boas-vindas calorosa",
+        text: `Oi, tudo bem? 😊 Seja bem-vindo(a) à Albertina Silva AST! Fico muito feliz com a sua mensagem. Aqui você vai encontrar roupas, sapatos, chinelos e acessórios lindos para o dia a dia e para ocasiões especiais. Como posso te ajudar hoje? 🌟`
+      },
+      {
+        tag: "Com convite ao catálogo",
+        text: `Olá! Que alegria receber a sua mensagem 💛 Sou a Albertina e aqui na nossa loja você encontra moda feminina com muito estilo — peças que a gente escolhe com carinho pra deixar qualquer look incrível. Me conta o que você está procurando e eu te ajudo a encontrar!`
+      },
+      {
+        tag: "Descontraída",
+        text: `Oi! Tudo bem? 🤍 Bem-vindo(a) à AST! Aqui você vai encontrar aquela peça que estava faltando no guarda-roupa — roupas, calçados e acessórios com muito gosto. O que você procura hoje?`
+      },
+      {
+        tag: "Com urgência suave",
+        text: `Oi! Que bom que nos encontrou! 🥰 Estamos com novidades lindas e algumas peças com estoque bem limitado. Me conta o que você está buscando e eu já te mando as opções!`
+      },
+      {
+        tag: "Para quem veio pelo post",
+        text: `Oi! Vi que você passou lá pelo nosso post — fico feliz demais que tenha curtido! 😍 Me conta o que chamou a sua atenção e eu já te passo todos os detalhes. Aqui é rapidinho!`
+      },
+      {
+        tag: "Receptiva e acolhedora",
+        text: `Olá, bem-vindo(a)! 💕 Obrigada por entrar em contato. A Albertina Silva AST é um espaço pensado para quem quer se vestir bem e se sentir ainda melhor. Me diz o que você procura — vou adorar te ajudar!`
+      }
+    ]
+  },
+  {
+    id: "preco",
+    icon: "💰",
+    name: "Perguntas sobre Preço",
+    desc: "Respostas para 'qual o preço?' sem revelar direto — geram conversa e aproximam o cliente.",
+    platform: ["wa", "fb"],
+    responses: [
+      {
+        tag: "Direcionando para o inbox",
+        text: `Oi! Os preços variam conforme o modelo, o tamanho e a disponibilidade — por isso prefiro te passar direto aqui no privado pra ser mais certinha com você 😊 Me diz qual peça você quer e eu já vejo tudo!`
+      },
+      {
+        tag: "Destaque no valor agregado",
+        text: `Olá! Trabalhamos com preços bem acessíveis pra quem quer qualidade 💛 Me envia o que você curtiu que eu mando o valor com todas as informações. Vai adorar!`
+      },
+      {
+        tag: "Gerando curiosidade",
+        text: `Oi! Temos opções pra todos os bolsos — e com muita qualidade! 😍 Me passa qual item ou categoria te interessou e eu já te mando os valores aqui no chat.`
+      },
+      {
+        tag: "Combinando com entrega",
+        text: `Olá! Além do preço, já posso te passar a forma de pagamento e prazo de entrega tudo de uma vez 😊 Me conta o que você viu e eu te ajudo na sequência!`
+      },
+      {
+        tag: "Casual e simpática",
+        text: `Oi! Os valores são bem caprichados — a gente se preocupa com o custo-benefício das peças 🌟 Me diz o que você curtiu que eu mando os detalhes agora!`
+      },
+      {
+        tag: "Para comentário no post",
+        text: `Oi! Vai direto no privado que eu te mando o valor, tamanhos e tudo mais! 💬 Te atendo na hora.`
+      }
+    ]
+  },
+  {
+    id: "disponibilidade",
+    icon: "📦",
+    name: "Disponibilidade e Tamanhos",
+    desc: "Respostas que informam sobre estoque e tamanhos com engajamento, sem desanimar o cliente.",
+    platform: ["wa", "fb"],
+    responses: [
+      {
+        tag: "Verificando estoque",
+        text: `Oi! Deixa eu verificar o estoque pra você agora 🔍 Me diz o modelo, a cor e o tamanho que você precisa e eu já confirmo!`
+      },
+      {
+        tag: "Tamanhos disponíveis",
+        text: `Olá! Trabalhamos com tamanhos PP ao GG em boa parte das peças, e alguns modelos chegam até o Plus Size 💕 Me conta o que você está procurando que eu verifico certinho pra você!`
+      },
+      {
+        tag: "Peça esgotada com alternativa",
+        text: `Oi! Esse item específico saiu do estoque, mas temos peças muito parecidas que você vai amar igualmente 😊 Me deixa te mostrar as opções — tenho certeza que você vai encontrar algo lindo!`
+      },
+      {
+        tag: "Urgência por estoque limitado",
+        text: `Oi! Esse modelinho está com poucas unidades — é bastante procurado! 🏃‍♀️ Me passa o seu tamanho que eu já verifico se ainda tem o seu. Corre que some rápido!`
+      },
+      {
+        tag: "Novidades chegando",
+        text: `Olá! Esse modelo está temporariamente fora, mas já vem reposição em breve 🌸 Posso te avisar quando chegar? Me manda o seu contato que te notifico na hora que estiver disponível!`
+      },
+      {
+        tag: "Para acessórios e calçados",
+        text: `Oi! Para calçados trabalhamos do 33 ao 43 dependendo do modelo 👡 Me diz o número e a peça que eu verifico o estoque pra você agora mesmo!`
+      }
+    ]
+  },
+  {
+    id: "entrega",
+    icon: "🚚",
+    name: "Perguntas sobre Entrega",
+    desc: "Respostas sobre prazos, envio, retirada e localização — claras e tranquilizadoras.",
+    platform: ["wa", "fb"],
+    responses: [
+      {
+        tag: "Prazo padrão",
+        text: `Oi! Realizamos envios para todo o Brasil pelos Correios e transportadoras 🚚 O prazo médio é de 5 a 10 dias úteis dependendo da sua região. Me passa o seu CEP que eu calculo direitinho pra você!`
+      },
+      {
+        tag: "Retirada na loja",
+        text: `Olá! Se preferir, você pode retirar pessoalmente na nossa loja sem custo de frete 😊 Me conta se essa opção te atende e eu te passo o endereço e horário de funcionamento!`
+      },
+      {
+        tag: "Entrega local / motoboy",
+        text: `Oi! Para clientes da nossa região fazemos entrega por motoboy com prazo bem rápido! 🛵 Me passa o seu bairro/cidade que eu já verifico a disponibilidade e o valor do frete.`
+      },
+      {
+        tag: "Envio com rastreio",
+        text: `Olá! Todos os pedidos são enviados com código de rastreamento — você acompanha a entrega em tempo real pelo site dos Correios 📦 Após o envio, eu mesmo(a) te mando o código aqui no chat!`
+      },
+      {
+        tag: "Pergunta sobre frete grátis",
+        text: `Oi! Trabalhamos com frete grátis em compras acima de um determinado valor 💛 Me diz o que você está pensando em levar que eu já calculo e te digo se o frete já é por nossa conta!`
+      },
+      {
+        tag: "Envio para o exterior",
+        text: `Oi! Por enquanto fazemos envios apenas para o Brasil 🇧🇷 Se você estiver em outra localidade, me conta sua situação e vejo o que posso fazer por você!`
+      }
+    ]
+  },
+  {
+    id: "comentarios",
+    icon: "💬",
+    name: "Comentários em Publicações",
+    desc: "Para responder nos posts do Facebook — elogios, 'quanto custa?', 'quero!', 'que lindo!'.",
+    platform: ["fb"],
+    responses: [
+      {
+        tag: "Para 'que lindo!' ou elogio",
+        text: `Que alegria ler isso! 😍 Essa peça realmente é um charme. Chama no privado que te conto todos os detalhes!`
+      },
+      {
+        tag: "Para 'quanto custa?'",
+        text: `Oi! Vai no inbox que te passo o valor e as opções disponíveis agora mesmo 💬✨`
+      },
+      {
+        tag: "Para 'quero!'",
+        text: `Aaaai adorei o entusiasmo! 🥰 Chama no privado que a gente resolve tudo rapidinho pra você!`
+      },
+      {
+        tag: "Para 'tem em qual tamanho?'",
+        text: `Oi! Me chama no privado que verifico os tamanhos disponíveis pra você na hora! 💕`
+      },
+      {
+        tag: "Para marcação de amiga no post",
+        text: `Vocês têm um gosto incrível! 😍 Chamem no inbox que eu atendo as duas com muito carinho!`
+      },
+      {
+        tag: "Para 'faz entrega?'",
+        text: `Sim, entregamos para todo o Brasil! 🚚 Me chama no privado que te passo o prazo e o frete certinho.`
+      },
+      {
+        tag: "Para comentário de emoji/coração",
+        text: `Você arrasou no gosto! 💛 Chama no privado pra saber mais sobre essa peça!`
+      },
+      {
+        tag: "Elogio à loja em geral",
+        text: `Que mensagem mais gostosa de receber! 🥰 Obrigada de coração! Sempre que precisar, é só chamar. A gente adora te receber aqui!`
+      }
+    ]
+  },
+  {
+    id: "indecisos",
+    icon: "🤔",
+    name: "Clientes Indecisos",
+    desc: "Para reconquistar quem ficou na dúvida, sumiu ou está pensando muito.",
+    platform: ["wa", "fb"],
+    responses: [
+      {
+        tag: "Retomada após silêncio",
+        text: `Oi! Tudo bem? 😊 Percebi que você ainda não finalizou a sua compra — queria saber se ficou alguma dúvida ou se posso te ajudar com alguma coisa. Estou por aqui!`
+      },
+      {
+        tag: "Urgência com estoque",
+        text: `Olá! Passei aqui pra avisar que a peça que você olhou está com o estoque bem baixinho — já vendemos bastante essa semana 😬 Se ainda tiver interesse, me fala logo que reservo pra você!`
+      },
+      {
+        tag: "Oferta ou facilidade de pagamento",
+        text: `Oi! Queria te avisar que estamos com facilidade no pagamento essa semana 💳 Talvez isso te ajude a fechar. Me conta se ainda tem interesse!`
+      },
+      {
+        tag: "Indecisão por tamanho",
+        text: `Oi! Se a dúvida for sobre o tamanho, fique tranquila — eu te ajudo a escolher certinho pela tabela de medidas, sem risco de errar 📏 É só me falar suas medidas!`
+      },
+      {
+        tag: "Empurrãozinho carinhoso",
+        text: `Olá! Sei que às vezes a gente fica na dúvida, né? 😄 Mas essa peça tem feito sucesso aqui — as clientes que levaram adoraram! Se quiser, posso te mandar mais fotos ou vídeo pra você decidir melhor 💛`
+      },
+      {
+        tag: "Após longo tempo sem resposta",
+        text: `Oi! Faz um tempinho que a gente conversou 😊 Queria saber se você encontrou o que procurava, ou se posso te ajudar com alguma novidade que chegou por aqui. Tem muita coisa linda!`
+      }
+    ]
+  },
+  {
+    id: "posvenda",
+    icon: "🌟",
+    name: "Pós-venda e Fidelização",
+    desc: "Mensagens de agradecimento, pedido de avaliação e convite para voltar.",
+    platform: ["wa", "fb"],
+    responses: [
+      {
+        tag: "Após confirmação de pedido",
+        text: `Pedido confirmado! 🎉 Muito obrigada pela confiança, fico feliz demais com a sua compra! Assim que enviar, já te mando o código de rastreamento. Qualquer dúvida, é só chamar 💛`
+      },
+      {
+        tag: "Após entrega",
+        text: `Oi! Passando pra saber se a sua encomenda chegou direitinho 📦😊 Espero que você esteja amando! Se tiver qualquer coisa, pode contar comigo.`
+      },
+      {
+        tag: "Pedido de avaliação",
+        text: `Oi! Espero que você esteja adorando a sua compra 💕 Quando puder, ficaria muito feliz se você deixasse uma avaliação pra gente — isso ajuda muito a loja a crescer e a atender mais pessoas. Obrigada de coração!`
+      },
+      {
+        tag: "Convite para voltar",
+        text: `Oi! Chegaram novidades lindas essa semana 🌸 Lembrei de você e vim avisar — tem peças que acho que você vai amar. Dá uma olhada no nosso perfil!`
+      },
+      {
+        tag: "Agradecimento especial",
+        text: `Quero só te dizer que é uma alegria enorme ter clientes como você! 🥰 Obrigada por confiar no nosso trabalho. Sempre que precisar, a AST está aqui com muito carinho.`
+      },
+      {
+        tag: "Pedido de indicação",
+        text: `Oi! Fico tão feliz quando os clientes ficam satisfeitos 💛 Se você conhece alguém que possa gostar das nossas peças, fica à vontade pra indicar — é sempre um prazer atender quem vem por indicação!`
+      }
+    ]
+  },
+  {
+    id: "reclamacoes",
+    icon: "🤝",
+    name: "Reclamações e Trocas",
+    desc: "Respostas empáticas e profissionais para resolver problemas sem defensividade.",
+    platform: ["wa", "fb"],
+    responses: [
+      {
+        tag: "Reclamação de produto",
+        text: `Oi! Que situação chata, me desculpe muito mesmo por isso 😔 Fico envergonhada que não saiu como esperado. Me conta com mais detalhes o que aconteceu e vamos resolver juntos(as) da melhor forma possível, tá?`
+      },
+      {
+        tag: "Pedido de troca",
+        text: `Olá! Que pena que não ficou como você esperava 😔 Sem problema — vamos verificar as opções de troca pra você! Me conta o que aconteceu e me envia uma foto se puder. Quero resolver isso rapidinho!`
+      },
+      {
+        tag: "Atraso na entrega",
+        text: `Oi! Entendo que é muito chato esperar além do prazo previsto 😔 Me desculpe pelo transtorno. Deixa eu verificar agora mesmo o que aconteceu com o seu pedido e te dou um retorno em breve, tá?`
+      },
+      {
+        tag: "Produto com defeito",
+        text: `Oi! Isso definitivamente não deveria acontecer e lamento muito 😔 Me manda a foto do produto e os dados do pedido que resolvo pra você com prioridade. Aqui a gente cuida dos clientes!`
+      },
+      {
+        tag: "Cliente irritado",
+        text: `Oi! Antes de tudo, quero te pedir desculpas pela experiência que você teve 😔 Entendo sua frustração e quero muito resolver isso da melhor forma. Pode me contar o que aconteceu que estou aqui pra te ouvir e ajudar.`
+      },
+      {
+        tag: "Resolução e encerramento",
+        text: `Que bom que conseguimos resolver juntos(as)! 😊 Fico aliviada. Me desculpe novamente pelo transtorno e espero que a próxima experiência com a gente seja ainda melhor. Pode contar comigo sempre! 💛`
+      }
+    ]
+  }
+];
+
+// Active category
+let activeCategory = 'all';
+let searchQuery = '';
+
+function buildSidebar(container) {
+  const allBtn = document.createElement('button');
+  allBtn.className = 'cat-btn' + (activeCategory === 'all' ? ' active' : '');
+  allBtn.innerHTML = `<span class="cat-icon">✨</span><span class="cat-name">Todas as respostas</span><span class="cat-count">${data.reduce((a,c)=>a+c.responses.length,0)}</span>`;
+  allBtn.onclick = () => { setCategory('all'); if(container.classList.contains('mobile-sidebar')) toggleMobileSidebar(); };
+  container.appendChild(allBtn);
+
+  data.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn' + (activeCategory === cat.id ? ' active' : '');
+    btn.innerHTML = `<span class="cat-icon">${cat.icon}</span><span class="cat-name">${cat.name}</span><span class="cat-count">${cat.responses.length}</span>`;
+    btn.onclick = () => { setCategory(cat.id); if(container.classList.contains('mobile-sidebar')) toggleMobileSidebar(); };
+    container.appendChild(btn);
+  });
+}
+
+function setCategory(id) {
+  activeCategory = id;
+  searchQuery = '';
+  document.getElementById('searchInput').value = '';
+  document.getElementById('clearSearch').classList.remove('visible');
+  renderContent();
+  updateSidebarActive();
+}
+
+function updateSidebarActive() {
+  document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+  // Re-render sidebars
+  document.getElementById('sidebarCats').innerHTML = '';
+  document.getElementById('mobileSidebar').innerHTML = '';
+  buildSidebar(document.getElementById('sidebarCats'));
+  buildSidebar(document.getElementById('mobileSidebar'));
+}
+
+function renderContent() {
+  const area = document.getElementById('contentArea');
+  area.innerHTML = '';
+
+  if (searchQuery.trim()) {
+    renderSearch(area);
+    return;
+  }
+
+  const cats = activeCategory === 'all' ? data : data.filter(c => c.id === activeCategory);
+
+  cats.forEach(cat => {
+    const section = document.createElement('div');
+    section.className = 'category-section';
+
+    const header = document.createElement('div');
+    header.className = 'section-header';
+    header.innerHTML = `
+      <span class="section-icon">${cat.icon}</span>
+      <h2>${cat.name}</h2>
+      <span class="section-count">${cat.responses.length} respostas</span>
+    `;
+    section.appendChild(header);
+
+    const desc = document.createElement('p');
+    desc.className = 'section-desc';
+    desc.textContent = cat.desc;
+    section.appendChild(desc);
+
+    const grid = document.createElement('div');
+    grid.className = 'cards-grid';
+
+    cat.responses.forEach((resp, i) => {
+      grid.appendChild(buildCard(resp, cat.platform));
+    });
+
+    section.appendChild(grid);
+    area.appendChild(section);
+  });
+}
+
+function renderSearch(area) {
+  const q = searchQuery.toLowerCase();
+  const results = [];
+
+  data.forEach(cat => {
+    cat.responses.forEach(resp => {
+      if (resp.text.toLowerCase().includes(q) || resp.tag.toLowerCase().includes(q) || cat.name.toLowerCase().includes(q)) {
+        results.push({ resp, cat });
+      }
+    });
+  });
+
+  const header = document.createElement('p');
+  header.className = 'search-results-header';
+  header.innerHTML = results.length > 0
+    ? `<span>${results.length}</span> resultado${results.length !== 1 ? 's' : ''} encontrado${results.length !== 1 ? 's' : ''} para "<span>${escapeHtml(searchQuery)}</span>"`
+    : `Nenhum resultado para "<span>${escapeHtml(searchQuery)}</span>"`;
+  area.appendChild(header);
+
+  if (results.length === 0) {
+    const noRes = document.createElement('div');
+    noRes.className = 'no-results';
+    noRes.innerHTML = `<div class="no-icon">🔍</div><p>Tente outras palavras-chave como "preço", "entrega", "tamanho"...</p>`;
+    area.appendChild(noRes);
+    return;
+  }
+
+  const grid = document.createElement('div');
+  grid.className = 'cards-grid';
+  results.forEach(({ resp, cat }) => {
+    grid.appendChild(buildCard(resp, cat.platform));
+  });
+  area.appendChild(grid);
+}
+
+function buildCard(resp, platforms) {
+  const card = document.createElement('div');
+  card.className = 'card';
+
+  const tag = document.createElement('span');
+  tag.className = 'card-tag';
+  tag.textContent = resp.tag;
+
+  const text = document.createElement('p');
+  text.className = 'card-text';
+  text.textContent = resp.text;
+
+  const actions = document.createElement('div');
+  actions.className = 'card-actions';
+
+  const badges = document.createElement('div');
+  badges.className = 'platform-badges';
+  platforms.forEach(p => {
+    const b = document.createElement('span');
+    b.className = `badge ${p}`;
+    b.textContent = p === 'fb' ? 'Facebook' : 'WhatsApp';
+    badges.appendChild(b);
+  });
+
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'copy-btn';
+  copyBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar`;
+  copyBtn.onclick = () => {
+    navigator.clipboard.writeText(resp.text).then(() => {
+      copyBtn.classList.add('copied');
+      copyBtn.innerHTML = `✓ Copiado!`;
+      showToast();
+      setTimeout(() => {
+        copyBtn.classList.remove('copied');
+        copyBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar`;
+      }, 2000);
+    });
+  };
+
+  actions.appendChild(badges);
+  actions.appendChild(copyBtn);
+
+  card.appendChild(tag);
+  card.appendChild(text);
+  card.appendChild(actions);
+  return card;
+}
+
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function clearSearch() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('clearSearch').classList.remove('visible');
+  searchQuery = '';
+  renderContent();
+}
+
+function toggleMobileSidebar() {
+  const ms = document.getElementById('mobileSidebar');
+  const arrow = document.getElementById('mobileArrow');
+  ms.classList.toggle('open');
+  arrow.textContent = ms.classList.contains('open') ? '▲' : '▼';
+}
+
+// Init
+document.getElementById('sidebarCats').innerHTML = '';
+document.getElementById('mobileSidebar').innerHTML = '';
+buildSidebar(document.getElementById('sidebarCats'));
+buildSidebar(document.getElementById('mobileSidebar'));
+renderContent();
+
+// Search
+document.getElementById('searchInput').addEventListener('input', function() {
+  searchQuery = this.value;
+  document.getElementById('clearSearch').classList.toggle('visible', searchQuery.length > 0);
+  renderContent();
+});
+</script>
 </body>
 </html>
